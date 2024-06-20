@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DigitVision</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .canvas-container {
+            border: 1px solid #dee2e6;
+            display: inline-block;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .neuron {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin: 5px;
+            font-size: 10px;
+            color: white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            cursor: pointer; /* Added cursor pointer */
+        }
+        .neuron-container {
+            display: inline-block;
+            text-align: center;
+            margin: 1px; /* Adjust margin as needed */
+        }
+        .neuron-number {
+            margin-bottom: 5px;
+            font-size: 26px; /* Adjust font size as needed */
+            color: #343a40; /* Adjust the color to match your design */
+        }
+        h1, h2 {
+            color: #343a40;
+        }
+        .btn-primary, .btn-secondary, .btn-info, .btn-success, .btn-danger {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        #result {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        #trainingData img {
+            margin: 1px;
+            cursor: pointer;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+        }
+        #logWindow {
+            height: 160px;
+            overflow-y: scroll;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            background-color: #ffffff;
+            margin-top: 20px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container my-4 text-center">
+        <h1 class="text-center">Neural Network App</h1>
+        <div class="row">
+            <div class="col-md-6 text-center">
+                <h2>Input Layer</h2>
+                <div class="canvas-container mx-auto">
+                    <canvas id="inputCanvas" width="200" height="200"></canvas>
+                </div>
+                <h2>↓</h2>
+                <div class="canvas-container mx-auto">
+                    <canvas id="extendedLineCanvas" width="320" height="10"></canvas>
+                </div>
+                <h2>↓ Hidden Layer ↓</h2>
+                <div id="hiddenLayer" class="neuron-container mx-auto"></div>
+                <h2>↓ Output Layer ↓</h2>
+                <div id="outputLayer" class="neuron-container mx-auto"></div>
+            </div>
+            <div class="col-md-6">
+                <h2>Dashboard</h2>
+                <div class="mb-3">
+                    <button id="predictButton" class="btn btn-primary">Predict</button>
+                    <button id="clearButton" class="btn btn-secondary">Clear</button>
+                    <button id="prepareButton" class="btn btn-info">Load Data</button>
+                    <button id="train1Button" class="btn btn-success">Train 1x</button>
+                    <button id="train10Button" class="btn btn-success">Train 10x</button>
+                    <button id="train100Button" class="btn btn-success">Train 100x</button>
+                    <button id="clearModelButton" class="btn btn-danger">Clear network</button>
+                    <button id="helpButton" class="btn btn-info">Help</button>
+                    <button id="graphsButton" class="btn btn-info">Graphs</button>
+                </div>
+                <div id="result" class="mt-3"></div>
+                <div id="logWindow" class="mt-3"></div>
+                <h2>Training Data</h2>
+                <div id="trainingData" class="d-flex flex-wrap"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">Help</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Welcome to the Neural Network App! Here’s how to use it:</p>
+                    <ul>
+                        <li><b>Input Layer:</b> Draw on the grid by clicking cells to toggle between black and white. This represents your input to the neural network.</li>
+                        <li><b>Predict:</b> Click "Predict" to see what the neural network thinks the digit is based on your input.</li>
+                        <li><b>Clear:</b> Use "Clear" to reset the input grid.</li>
+                        <li><b>Prepare Data:</b> Click "Prepare Data" to load training data. This data is used to train the neural network.</li>
+                        <li><b>Train:</b> Train the neural network by clicking "Train 1 Epoch", "Train 10 Epochs", or "Train 100 Epochs". Training improves the network's accuracy.</li>
+                        <li><b>Clear Model Data:</b> Use this button to reset the neural network, clearing all trained data.</li>
+                        <li><b>Hidden and Output Layers:</b> These show the activations of neurons in the hidden and output layers. Clicking on output neurons will train the network with your input as the corresponding digit.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphs Modal -->
+    <div class="modal fade" id="graphsModal" tabindex="-1" role="dialog" aria-labelledby="graphsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="graphsModalLabel">Training and Validation Metrics</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>Training Loss</h3>
+                            <canvas id="trainingLossChart"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <h3>Validation Loss</h3>
+                            <canvas id="validationLossChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>Training Accuracy</h3>
+                            <canvas id="trainingAccuracyChart"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <h3>Validation Accuracy</h3>
+                            <canvas id="validationAccuracyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/static/index.js"></script>
+</body>
+</html>
