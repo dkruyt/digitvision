@@ -68,7 +68,7 @@
 </head>
 <body>
     <div class="container my-4 text-center">
-        <h1 class="text-center">Neural Network App</h1>
+        <h1 class="text-center">DigitVision</h1>
         <div class="row">
             <div class="col-md-6 text-center">
                 <h2>Input Layer</h2>
@@ -116,16 +116,42 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>Welcome to the Neural Network App! Here’s how to use it:</p>
-                    <ul>
-                        <li><b>Input Layer:</b> Draw on the grid by clicking cells to toggle between black and white. This represents your input to the neural network.</li>
-                        <li><b>Predict:</b> Click "Predict" to see what the neural network thinks the digit is based on your input.</li>
-                        <li><b>Clear:</b> Use "Clear" to reset the input grid.</li>
-                        <li><b>Prepare Data:</b> Click "Prepare Data" to load training data. This data is used to train the neural network.</li>
-                        <li><b>Train:</b> Train the neural network by clicking "Train 1 Epoch", "Train 10 Epochs", or "Train 100 Epochs". Training improves the network's accuracy.</li>
-                        <li><b>Clear Model Data:</b> Use this button to reset the neural network, clearing all trained data.</li>
-                        <li><b>Hidden and Output Layers:</b> These show the activations of neurons in the hidden and output layers. Clicking on output neurons will train the network with your input as the corresponding digit.</li>
-                    </ul>
+                    <h4>Welcome to DigitVision!</h4>
+                    <p>DigitVision is an interactive web application that allows you to explore and understand how a neural network recognizes handwritten digits. Follow the steps below to get started:</p>
+                    <ol>
+                        <li>
+                            <strong>Load Training Data:</strong> Click the "Load Data" button to load the training data. This data consists of a collection of handwritten digits that will be used to train the neural network. The loaded training images will be displayed in the "Training Data" section.
+                            <br><small>Behind the scenes, the app preprocesses the Optical Recognition of Handwritten Digits dataset, normalizing pixel values and limiting the number of samples per digit class to ensure a balanced dataset.</small>
+                        </li>
+                        <li>
+                            <strong>Explore the Neural Network:</strong> Take a moment to familiarize yourself with the neural network architecture displayed on the left side of the screen. The input layer represents an 8x8 grid where you can draw a digit, the hidden layer consists of neurons that learn to recognize patterns, and the output layer represents the predicted digit.
+                            <br><small>The neural network is defined using PyTorch, with a configurable number of hidden neurons and output classes. The app uses the ReLU activation function and CrossEntropyLoss for training.</small>
+                        </li>
+                        <li>
+                            <strong>Draw a Digit:</strong> Use your mouse to draw a digit on the input layer grid. Click on individual cells to toggle them between black and white. The goal is to draw a recognizable digit that the neural network can predict.
+                        </li>
+                        <li>
+                            <strong>Make a Prediction:</strong> Once you've drawn a digit, click the "Predict" button to see what the neural network thinks the digit is. The predicted digit will be displayed in the "Dashboard" section.
+                            <br><small>When you click "Predict," the app sends the drawn digit to the server, where it is preprocessed and fed through the neural network. The activations of the hidden and output layers are computed, and the predicted digit is determined based on the highest output activation.</small>
+                        </li>
+                        <li>
+                            <strong>Train the Neural Network:</strong> To improve the neural network's accuracy, you can train it using the loaded training data. Click the "Train 1x," "Train 10x," or "Train 100x" buttons to train the network for the specified number of epochs. During training, the app will display the training progress and metrics in the log window.
+                            <br><small>The training process involves iterating over the training data, feeding it through the neural network, computing the loss, and updating the network's weights using backpropagation. The app uses the Adam optimizer and logs the training metrics for each epoch.</small>
+                        </li>
+                        <li>
+                            <strong>Evaluate the Neural Network:</strong> After training, you can draw more digits and click "Predict" to see how well the neural network performs. The app will display the predicted digit and the activations of the hidden and output layers.
+                        </li>
+                        <li>
+                            <strong>Explore Further:</strong>
+                            <ul>
+                                <li>Click on the neurons in the output layer to see how the neural network responds when you manually assign a label to your drawn digit. This can help you understand how the network learns from individual examples.</li>
+                                <li>Use the "Clear" button to clear the input layer grid and start drawing a new digit.</li>
+                                <li>Click the "Clear Model Data" button to reset the neural network to its initial state, clearing all learned weights.</li>
+                                <li>Explore the "Graphs" section to visualize the training and validation metrics, including loss and accuracy over epochs.</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <p>Have fun exploring and learning about neural networks and handwritten digit recognition with DigitVision!</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
