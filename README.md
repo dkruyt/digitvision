@@ -5,11 +5,9 @@ DigitVision is a flask web application built on PyTorch that allows users to int
 ## Features
 
 - **Interactive Digit Drawing:** Draw digits on a grid to test the neural network's predictions.
+- **Train Induvidual Digits** By clicking on the output neuron you can train your own digits.
 - **Real-Time Training:** Train the neural network on a dataset of handwritten digits and visualize training progress in real-time.
 - **Metrics Visualization:** View training and validation loss and accuracy in a popup graph.
-- **Model Management:** Save and load trained models for later use.
-- **Hyperparameter Tuning:** Adjust training parameters like learning rate and batch size through the UI.
-- **Confusion Matrix:** Visualize the model's performance using a confusion matrix.
 
 ## Screenshots
 
