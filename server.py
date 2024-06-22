@@ -234,6 +234,27 @@ def load_training_image():
 def get_training_metrics():
     return jsonify(training_metrics)
 
+@app.route('/network_visualization', methods=['POST'])
+def get_network_visualization():
+    input_grid = request.json['inputGrid']
+    inverted_input_grid = 1 - np.array(input_grid).flatten()
+    input_tensor = torch.tensor(inverted_input_grid[np.newaxis, :], dtype=torch.float32)
+
+    with torch.no_grad():
+        hidden_activations = model.activation(model.hidden(input_tensor)).numpy()
+        output_activations = model(input_tensor).numpy()
+
+    hidden_weights = model.hidden.weight.data.numpy()
+    output_weights = model.output.weight.data.numpy()
+
+    return jsonify({
+        'inputActivations': inverted_input_grid.tolist(),
+        'hiddenActivations': hidden_activations.tolist(),
+        'outputActivations': output_activations.tolist(),
+        'hiddenWeights': hidden_weights.tolist(),
+        'outputWeights': output_weights.tolist()
+    })
+
 @app.route('/distributions', methods=['POST'])
 def get_distributions():
     input_grid = request.json['inputGrid']

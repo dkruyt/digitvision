@@ -141,12 +141,31 @@
                             <button id="helpButton" class="btn btn-info"><i class="fas fa-question-circle"></i> Help</button>
                             <button id="graphsButton" class="btn btn-info"><i class="fas fa-chart-line"></i> Graphs</button>
                             <button id="distributionsButton" class="btn btn-info"><i class="fas fa-chart-bar"></i> Distributions</button>
+                            <button id="networkVisualizationButton" class="btn btn-info"><i class="fas fa-project-diagram"></i> Network Visualization</button>
                         </div>
                         <div id="result" class="mt-3"></div>
                         <div id="logWindow" class="mt-3"></div>
                         <h3 class="mt-4">Training Data</h3>
                         <div id="trainingData" class="d-flex flex-wrap"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Network Visualization Modal -->
+    <div class="modal fade" id="networkVisualizationModal" tabindex="-1" aria-labelledby="networkVisualizationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="networkVisualizationModalLabel">Neural Network Visualization</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <canvas id="networkVisualizationCanvas"></canvas>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

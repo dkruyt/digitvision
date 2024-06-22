@@ -25,7 +25,92 @@ $(document).ready(function() {
             }
         });
     }
+
+    function drawNetworkVisualization(data) {
+        var canvas = document.getElementById('networkVisualizationCanvas');
+        var ctx = canvas.getContext('2d');
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Set canvas size
+        canvas.width = 1000;
+        canvas.height = 1024;
+        
+        // Define neuron positions
+        var inputNeurons = data.inputActivations.length;
+        var hiddenNeurons = data.hiddenActivations[0].length;
+        var outputNeurons = data.outputActivations[0].length;
+        
+        var inputLayer = Array.from({length: inputNeurons}, (_, i) => ({x: 150, y: 20 + i * (960 / inputNeurons)}));
+        var hiddenLayer = Array.from({length: hiddenNeurons}, (_, i) => ({x: 500, y: 330 + i * (360 / hiddenNeurons)}));
+        var outputLayer = Array.from({length: outputNeurons}, (_, i) => ({x: 850, y: 320 + i * (360 / outputNeurons)}));
+        
+        // Draw connections
+        for (let i = 0; i < inputNeurons; i++) {
+            for (let j = 0; j < hiddenNeurons; j++) {
+                drawConnection(ctx, inputLayer[i], hiddenLayer[j], data.hiddenWeights[j][i]);
+            }
+        }
+        
+        for (let i = 0; i < hiddenNeurons; i++) {
+            for (let j = 0; j < outputNeurons; j++) {
+                drawConnection(ctx, hiddenLayer[i], outputLayer[j], data.outputWeights[j][i]);
+            }
+        }
+        
+        // Draw neurons
+        drawNeurons(ctx, inputLayer, data.inputActivations);
+        drawNeurons(ctx, hiddenLayer, data.hiddenActivations[0]);
+        drawNeurons(ctx, outputLayer, data.outputActivations[0]);
+    }
     
+    function drawConnection(ctx, start, end, weight) {
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.strokeStyle = getWeightColor(weight);
+        ctx.lineWidth = Math.abs(weight) * 2;
+        ctx.stroke();
+    }
+    
+    function drawNeurons(ctx, neurons, activations) {
+        neurons.forEach((neuron, i) => {
+            ctx.beginPath();
+            ctx.arc(neuron.x, neuron.y, 7, 0, 2 * Math.PI);
+            ctx.fillStyle = getActivationColor(activations[i]);
+            ctx.fill();
+        });
+    }
+    
+    function getWeightColor(weight) {
+        var r = weight > 0 ? 255 : 0;
+        var b = weight < 0 ? 255 : 0;
+        var g = 0;
+        var a = Math.min(Math.abs(weight), 1);
+        return `rgba(${r},${g},${b},${a})`;
+    }
+    
+    function getActivationColor(activation) {
+        var r = Math.round(activation * 255);
+        var g = 0;        
+        var b = Math.round(activation * 255);
+        return `rgb(${r},${g},${b})`;
+    }
+    
+    function showNetworkVisualization() {
+        $.ajax({
+            url: '/network_visualization',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ inputGrid: inputGrid }),
+            success: function(response) {
+                drawNetworkVisualization(response);
+                $('#networkVisualizationModal').modal('show');
+            }
+        });
+    }
+
     function updateConfidenceChart(confidence) {
         var ctx = document.getElementById('confidenceChart').getContext('2d');
         new Chart(ctx, {
@@ -55,7 +140,8 @@ $(document).ready(function() {
         updateDistributions();
         $('#distributionsModal').modal('show');
     });
-    
+    $('#networkVisualizationButton').click(showNetworkVisualization);
+
     function drawInputGrid() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
