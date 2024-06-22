@@ -140,6 +140,7 @@
                             <button id="clearModelButton" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Clear network</button>
                             <button id="helpButton" class="btn btn-info"><i class="fas fa-question-circle"></i> Help</button>
                             <button id="graphsButton" class="btn btn-info"><i class="fas fa-chart-line"></i> Graphs</button>
+                            <button id="distributionsButton" class="btn btn-info"><i class="fas fa-chart-bar"></i> Distributions</button>
                         </div>
                         <div id="result" class="mt-3"></div>
                         <div id="logWindow" class="mt-3"></div>
@@ -195,7 +196,26 @@
                             </ul>
                         </li>
                     </ol>
-                    <p>Have fun exploring and learning about neural networks and handwritten digit recognition with DigitVision!</p>                </div>
+                    <p>Have fun exploring and learning about neural networks and handwritten digit recognition with DigitVision!</p>
+    
+                    <h4>Additional Information: What is Backpropagation?</h4>
+                    <p>Backpropagation is the core algorithm behind how neural networks learn. Here's a brief overview based on the transcription:</p>
+                    <ul>
+                        <li>Backpropagation computes the gradient of the cost function, which tells you how to change weights and biases to decrease the cost most efficiently.</li>
+                        <li>It works by propagating errors backwards through the network, adjusting weights and biases based on their impact on the output.</li>
+                        <li>The process involves:
+                            <ol>
+                                <li>Feeding forward information through the network</li>
+                                <li>Comparing the output to the desired result</li>
+                                <li>Calculating the error</li>
+                                <li>Propagating this error backwards, adjusting weights and biases</li>
+                            </ol>
+                        </li>
+                        <li>The algorithm considers how sensitive the cost function is to each weight and bias.</li>
+                        <li>In practice, stochastic gradient descent is often used, which uses mini-batches of data to approximate the gradient, speeding up the learning process.</li>
+                    </ul>
+                    <p>Understanding backpropagation helps in grasping how DigitVision's neural network learns to recognize handwritten digits over time.</p>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
@@ -230,6 +250,43 @@
                         <div class="col-md-6">
                             <h3>Validation Accuracy</h3>
                             <canvas id="validationAccuracyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Distributions Modal -->
+    <div class="modal fade" id="distributionsModal" tabindex="-1" aria-labelledby="distributionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="distributionsModalLabel">Distributions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>Weight Distribution</h3>
+                            <img id="weightHistogram" class="img-fluid">
+                        </div>
+                        <div class="col-md-6">
+                            <h3>Bias Distribution</h3>
+                            <img id="biasHistogram" class="img-fluid">
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h3>Activation Distribution</h3>
+                            <img id="activationHistogram" class="img-fluid">
+                        </div>
+                        <div class="col-md-6">
+                            <h3>Prediction Confidence</h3>
+                            <canvas id="confidenceChart"></canvas>
                         </div>
                     </div>
                 </div>

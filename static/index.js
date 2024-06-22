@@ -11,6 +11,51 @@ $(document).ready(function() {
     var trainingAccuracyChart;
     var validationAccuracyChart;
 
+    function updateDistributions() {
+        $.ajax({
+            url: '/distributions',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ inputGrid: inputGrid }),
+            success: function(response) {
+                $('#weightHistogram').attr('src', 'data:image/png;base64,' + response.weightHist);
+                $('#biasHistogram').attr('src', 'data:image/png;base64,' + response.biasHist);
+                $('#activationHistogram').attr('src', 'data:image/png;base64,' + response.activationHist);
+                updateConfidenceChart(response.confidence);
+            }
+        });
+    }
+    
+    function updateConfidenceChart(confidence) {
+        var ctx = document.getElementById('confidenceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Array.from({length: confidence.length}, (_, i) => i),
+                datasets: [{
+                    label: 'Confidence',
+                    data: confidence,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1
+                    }
+                }
+            }
+        });
+    }
+    
+    $('#distributionsButton').click(function() {
+        updateDistributions();
+        $('#distributionsModal').modal('show');
+    });
+    
     function drawInputGrid() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
