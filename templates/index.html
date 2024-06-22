@@ -1,18 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DigitVision</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
+            font-family: 'Roboto', sans-serif;
         }
         .canvas-container {
-            border: 1px solid #dee2e6;
+            border: 2px solid #007bff;
             display: inline-block;
             margin-bottom: 20px;
-            border-radius: 5px;
+            border-radius: 10px;
             overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .neuron {
             display: inline-block;
@@ -24,96 +29,155 @@
             margin: 5px;
             font-size: 10px;
             color: white;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-            cursor: pointer; /* Added cursor pointer */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .neuron:hover {
+            transform: scale(1.2);
         }
         .neuron-container {
             display: inline-block;
             text-align: center;
-            margin: 1px; /* Adjust margin as needed */
+            margin: 1px;
         }
         .neuron-number {
             margin-bottom: 5px;
-            font-size: 26px; /* Adjust font size as needed */
-            color: #343a40; /* Adjust the color to match your design */
+            font-size: 20px;
+            color: #343a40;
+            font-weight: bold;
         }
         h1, h2 {
-            color: #343a40;
+            color: #007bff;
+            margin-bottom: 20px;
         }
-        .btn-primary, .btn-secondary, .btn-info, .btn-success, .btn-danger {
+        .btn {
             margin-right: 10px;
             margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         #result {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: bold;
             color: #28a745;
+            margin-top: 20px;
         }
         #trainingData img {
-            margin: 1px;
+            margin: 2px;
             cursor: pointer;
             border: 1px solid #dee2e6;
-            border-radius: 3px;
+            border-radius: 5px;
+            transition: transform 0.2s;
+        }
+        #trainingData img:hover {
+            transform: scale(1.1);
         }
         #logWindow {
-            height: 160px;
+            height: 200px;
             overflow-y: scroll;
             border: 1px solid #dee2e6;
-            padding: 10px;
+            padding: 15px;
             background-color: #ffffff;
             margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="container my-4 text-center">
-        <h1 class="text-center">DigitVision</h1>
+    <div class="container my-5">
+        <h1 class="text-center mb-5"><i class="fas fa-brain"></i> DigitVision</h1>
         <div class="row">
-            <div class="col-md-6 text-center">
-                <h2>Input Layer</h2>
-                <div class="canvas-container mx-auto">
-                    <canvas id="inputCanvas" width="200" height="200"></canvas>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Neural Network Visualization</h2>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3>Input Layer</h3>
+                        <div class="canvas-container mx-auto">
+                            <canvas id="inputCanvas" width="200" height="200"></canvas>
+                        </div>
+                        <h3 class="mt-3"><i class="fas fa-arrow-down"></i></h3>
+                        <div class="canvas-container mx-auto">
+                            <canvas id="extendedLineCanvas" width="320" height="10"></canvas>
+                        </div>
+                        <h3 class="mt-3"><i class="fas fa-arrow-down"></i>Hidden Layer <i class="fas fa-arrow-down"></i></h3>
+                        <div id="hiddenLayer" class="neuron-container mx-auto"></div>
+                        <h3 class="mt-3"><i class="fas fa-arrow-down"></i>Output Layer <i class="fas fa-arrow-down"></i></h3>
+                        <div id="outputLayer" class="neuron-container mx-auto"></div>
+                    </div>
                 </div>
-                <h2>↓</h2>
-                <div class="canvas-container mx-auto">
-                    <canvas id="extendedLineCanvas" width="320" height="10"></canvas>
-                </div>
-                <h2>↓ Hidden Layer ↓</h2>
-                <div id="hiddenLayer" class="neuron-container mx-auto"></div>
-                <h2>↓ Output Layer ↓</h2>
-                <div id="outputLayer" class="neuron-container mx-auto"></div>
             </div>
-            <div class="col-md-6">
-                <h2>Dashboard</h2>
-                <div class="mb-3">
-                    <button id="predictButton" class="btn btn-primary">Predict</button>
-                    <button id="clearButton" class="btn btn-secondary">Clear</button>
-                    <button id="prepareButton" class="btn btn-info">Load Data</button>
-                    <button id="train1Button" class="btn btn-success">Train 1x</button>
-                    <button id="train10Button" class="btn btn-success">Train 10x</button>
-                    <button id="train100Button" class="btn btn-success">Train 100x</button>
-                    <button id="clearModelButton" class="btn btn-danger">Clear network</button>
-                    <button id="helpButton" class="btn btn-info">Help</button>
-                    <button id="graphsButton" class="btn btn-info">Graphs</button>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Dashboard</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <button id="predictButton" class="btn btn-primary"><i class="fas fa-magic"></i> Predict</button>
+                            <button id="clearButton" class="btn btn-secondary"><i class="fas fa-eraser"></i> Clear</button>
+                            <button id="prepareButton" class="btn btn-info"><i class="fas fa-database"></i> Load Data</button>
+                            <button id="train1Button" class="btn btn-success"><i class="fas fa-graduation-cap"></i> Train 1x</button>
+                            <button id="train10Button" class="btn btn-success"><i class="fas fa-graduation-cap"></i> Train 10x</button>
+                            <button id="train100Button" class="btn btn-success"><i class="fas fa-graduation-cap"></i> Train 100x</button>
+                            <button id="clearModelButton" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Clear network</button>
+                            <button id="helpButton" class="btn btn-info"><i class="fas fa-question-circle"></i> Help</button>
+                            <button id="graphsButton" class="btn btn-info"><i class="fas fa-chart-line"></i> Graphs</button>
+                            <button id="distributionsButton" class="btn btn-info"><i class="fas fa-chart-bar"></i> Distributions</button>
+                            <button id="networkVisualizationButton" class="btn btn-info"><i class="fas fa-project-diagram"></i> Network Visualization</button>
+                        </div>
+                        <div id="result" class="mt-3"></div>
+                        <div id="logWindow" class="mt-3"></div>
+                        <h3 class="mt-4">Training Data</h3>
+                        <div id="trainingData" class="d-flex flex-wrap"></div>
+                    </div>
                 </div>
-                <div id="result" class="mt-3"></div>
-                <div id="logWindow" class="mt-3"></div>
-                <h2>Training Data</h2>
-                <div id="trainingData" class="d-flex flex-wrap"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Network Visualization Modal -->
+    <div class="modal fade" id="networkVisualizationModal" tabindex="-1" aria-labelledby="networkVisualizationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="networkVisualizationModalLabel">Neural Network Visualization</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <canvas id="networkVisualizationCanvas"></canvas>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Help Modal -->
-    <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="helpModalLabel">Help</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <h4>Welcome to DigitVision!</h4>
@@ -152,23 +216,39 @@
                         </li>
                     </ol>
                     <p>Have fun exploring and learning about neural networks and handwritten digit recognition with DigitVision!</p>
+    
+                    <h4>Additional Information: What is Backpropagation?</h4>
+                    <p>Backpropagation is the core algorithm behind how neural networks learn. Here's a brief overview based on the transcription:</p>
+                    <ul>
+                        <li>Backpropagation computes the gradient of the cost function, which tells you how to change weights and biases to decrease the cost most efficiently.</li>
+                        <li>It works by propagating errors backwards through the network, adjusting weights and biases based on their impact on the output.</li>
+                        <li>The process involves:
+                            <ol>
+                                <li>Feeding forward information through the network</li>
+                                <li>Comparing the output to the desired result</li>
+                                <li>Calculating the error</li>
+                                <li>Propagating this error backwards, adjusting weights and biases</li>
+                            </ol>
+                        </li>
+                        <li>The algorithm considers how sensitive the cost function is to each weight and bias.</li>
+                        <li>In practice, stochastic gradient descent is often used, which uses mini-batches of data to approximate the gradient, speeding up the learning process.</li>
+                    </ul>
+                    <p>Understanding backpropagation helps in grasping how DigitVision's neural network learns to recognize handwritten digits over time.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Graphs Modal -->
-    <div class="modal fade" id="graphsModal" tabindex="-1" role="dialog" aria-labelledby="graphsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="graphsModal" tabindex="-1" aria-labelledby="graphsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="graphsModalLabel">Training and Validation Metrics</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -181,7 +261,7 @@
                             <canvas id="validationLossChart"></canvas>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mt-4">
                         <div class="col-md-6">
                             <h3>Training Accuracy</h3>
                             <canvas id="trainingAccuracyChart"></canvas>
@@ -193,15 +273,52 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Distributions Modal -->
+    <div class="modal fade" id="distributionsModal" tabindex="-1" aria-labelledby="distributionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="distributionsModalLabel">Distributions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>Weight Distribution</h3>
+                            <img id="weightHistogram" class="img-fluid">
+                        </div>
+                        <div class="col-md-6">
+                            <h3>Bias Distribution</h3>
+                            <img id="biasHistogram" class="img-fluid">
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h3>Activation Distribution</h3>
+                            <img id="activationHistogram" class="img-fluid">
+                        </div>
+                        <div class="col-md-6">
+                            <h3>Prediction Confidence</h3>
+                            <canvas id="confidenceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/index.js"></script>
 </body>
 </html>

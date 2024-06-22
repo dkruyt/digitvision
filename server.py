@@ -11,6 +11,9 @@ import pandas as pd
 import io
 import base64
 from PIL import Image
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, TensorDataset
 
 app = Flask(__name__)
@@ -28,6 +31,16 @@ class SimpleNN(nn.Module):
         x = self.activation(self.hidden(x))
         x = self.output(x)  # No activation here; will use CrossEntropyLoss
         return x
+
+    def get_weight_bias_distributions(self):
+        weights = self.hidden.weight.data.flatten().tolist()
+        biases = self.hidden.bias.data.flatten().tolist()
+        return weights, biases
+
+    def get_activation_distribution(self, x):
+        with torch.no_grad():
+            hidden_activations = self.activation(self.hidden(x)).flatten().tolist()
+        return hidden_activations
 
 # Preprocess the Optical Recognition of Handwritten Digits data
 def preprocess_digits(target_size=(8, 8), limit_per_digit=17, num_classes=10):
@@ -220,6 +233,61 @@ def load_training_image():
 @app.route('/training_metrics', methods=['GET'])
 def get_training_metrics():
     return jsonify(training_metrics)
+
+@app.route('/network_visualization', methods=['POST'])
+def get_network_visualization():
+    input_grid = request.json['inputGrid']
+    inverted_input_grid = 1 - np.array(input_grid).flatten()
+    input_tensor = torch.tensor(inverted_input_grid[np.newaxis, :], dtype=torch.float32)
+
+    with torch.no_grad():
+        hidden_activations = model.activation(model.hidden(input_tensor)).numpy()
+        output_activations = model(input_tensor).numpy()
+
+    hidden_weights = model.hidden.weight.data.numpy()
+    output_weights = model.output.weight.data.numpy()
+
+    return jsonify({
+        'inputActivations': inverted_input_grid.tolist(),
+        'hiddenActivations': hidden_activations.tolist(),
+        'outputActivations': output_activations.tolist(),
+        'hiddenWeights': hidden_weights.tolist(),
+        'outputWeights': output_weights.tolist()
+    })
+
+@app.route('/distributions', methods=['POST'])
+def get_distributions():
+    input_grid = request.json['inputGrid']
+    inverted_input_grid = 1 - np.array(input_grid).flatten()
+    input_tensor = torch.tensor(inverted_input_grid[np.newaxis, :], dtype=torch.float32)
+
+    weights, biases = model.get_weight_bias_distributions()
+    activations = model.get_activation_distribution(input_tensor)
+    
+    with torch.no_grad():
+        output = model(input_tensor)
+        confidence = torch.nn.functional.softmax(output, dim=1).flatten().tolist()
+
+    def create_histogram(data, title):
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.hist(data, bins=30)
+        ax.set_title(title)
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        plt.close(fig)
+        return base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    weight_hist = create_histogram(weights, 'Weight Distribution')
+    bias_hist = create_histogram(biases, 'Bias Distribution')
+    activation_hist = create_histogram(activations, 'Activation Distribution')
+
+    return jsonify({
+        'weightHist': weight_hist,
+        'biasHist': bias_hist,
+        'activationHist': activation_hist,
+        'confidence': confidence
+    })
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train a simple neural network on the Optical Recognition of Handwritten Digits dataset.')
