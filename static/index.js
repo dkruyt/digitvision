@@ -39,7 +39,7 @@ $(document).ready(function() {
             var value = inputGrid[row][col];
             var color = 'rgb(' + Math.round(value * 255) + ', ' + Math.round(value * 255) + ', ' + Math.round(value * 255) + ')';
             extendedLineCtx.fillStyle = color;
-            extendedLineCtx.fillRect(i * 5, 0, 4, 4);
+            extendedLineCtx.fillRect(i * 5, 3, 4, 4);
         }
     }
 
