@@ -400,6 +400,34 @@ $(document).ready(function() {
         });
     }
 
+    $('#showConfusionMatrixButton').click(function() {
+        $.ajax({
+            url: '/confusion_matrix',
+            method: 'GET',
+            success: function(response) {
+                displayConfusionMatrix(response.confusionMatrix);
+                $('#confusionMatrixModal').modal('show');
+            }
+        });
+    });
+    
+    function displayConfusionMatrix(confusionMatrix) {
+        var labels = Array.from({length: 10}, (_, i) => i);
+        var data = [{
+            z: confusionMatrix,
+            x: labels,
+            y: labels,
+            type: 'heatmap',
+            colorscale: 'Viridis'
+        }];
+        var layout = {
+            title: 'Confusion Matrix',
+            xaxis: {title: 'Predicted'},
+            yaxis: {title: 'Actual'}
+        };
+        Plotly.newPlot('confusionMatrixContainer', data, layout);
+    }
+
     function updateCharts(metrics) {
         trainingLossChart.data.labels = metrics.epoch;
         trainingLossChart.data.datasets[0].data = metrics.training_loss;

@@ -15,6 +15,7 @@ import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, TensorDataset
+from sklearn.metrics import confusion_matrix
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -163,6 +164,16 @@ def predict():
         'outputActivations': output_activations.tolist()
     }
     return jsonify(result)
+
+@app.route('/confusion_matrix', methods=['GET'])
+def get_confusion_matrix():
+    global model, input_data, target_data
+    model.eval()
+    with torch.no_grad():
+        outputs = model(torch.tensor(1 - input_data, dtype=torch.float32))
+        _, predicted = torch.max(outputs, 1)
+    cm = confusion_matrix(target_data, predicted.numpy())
+    return jsonify({'confusionMatrix': cm.tolist()})
 
 @app.route('/train', methods=['POST'])
 def train_model():
