@@ -302,7 +302,7 @@ def get_distributions():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train a simple neural network on the Optical Recognition of Handwritten Digits dataset.')
-    parser.add_argument('--hidden_neurons', type=int, default=16, help='Number of neurons in the hidden layer (default: 16)')
+    parser.add_argument('--hidden_neurons', type=int, default=8, help='Number of neurons in the hidden layer (default: 8)')
     parser.add_argument('--limit_per_digit', type=int, default=17, help='Number of digits per class for training (default: 17)')
     parser.add_argument('--num_classes', type=int, default=10, help='Number of output neurons and number of digit classes (default: 10)')
 
