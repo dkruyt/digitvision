@@ -15,6 +15,7 @@ import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, TensorDataset
+from sklearn.metrics import confusion_matrix
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -164,6 +165,16 @@ def predict():
     }
     return jsonify(result)
 
+@app.route('/confusion_matrix', methods=['GET'])
+def get_confusion_matrix():
+    global model, input_data, target_data
+    model.eval()
+    with torch.no_grad():
+        outputs = model(torch.tensor(1 - input_data, dtype=torch.float32))
+        _, predicted = torch.max(outputs, 1)
+    cm = confusion_matrix(target_data, predicted.numpy())
+    return jsonify({'confusionMatrix': cm.tolist()})
+
 @app.route('/train', methods=['POST'])
 def train_model():
     global model, input_data, target_data
@@ -291,7 +302,7 @@ def get_distributions():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train a simple neural network on the Optical Recognition of Handwritten Digits dataset.')
-    parser.add_argument('--hidden_neurons', type=int, default=16, help='Number of neurons in the hidden layer (default: 16)')
+    parser.add_argument('--hidden_neurons', type=int, default=8, help='Number of neurons in the hidden layer (default: 8)')
     parser.add_argument('--limit_per_digit', type=int, default=17, help='Number of digits per class for training (default: 17)')
     parser.add_argument('--num_classes', type=int, default=10, help='Number of output neurons and number of digit classes (default: 10)')
 
