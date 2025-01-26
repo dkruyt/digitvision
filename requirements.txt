@@ -7,4 +7,4 @@ requests
 Pillow
 eventlet
 matplotlib
-sklearn
+scikit-learn
